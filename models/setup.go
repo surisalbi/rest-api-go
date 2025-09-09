@@ -20,5 +20,6 @@ func ConnectDatabase() {
 	// migrasi tabel jika tabel di database kosong
 	db.AutoMigrate(&Book{})
 	db.AutoMigrate(&Author{})
+	db.AutoMigrate(&Member{})
 	DB = db
 }
