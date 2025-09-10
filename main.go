@@ -12,6 +12,12 @@ func main() {
 	models.ConnectDatabase()
 
 	app := fiber.New()
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message": "Selamat datang di REST API Golang 🚀 by Suri Salbi",
+		})
+	})
 	
 	app.Get("/api/books", bookcontroller.Index)
 	app.Get("/api/books/:id", bookcontroller.Show)
