@@ -13,7 +13,8 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	mysqlURL := os.Getenv("mysql://root:cfQJevUGGDUfPbvfXhImdnTvCbiwdHTd@mysql.railway.internal:3306/railway")
+	// Ambil dari environment Railway
+	mysqlURL := os.Getenv("MYSQL_URL")
 
 	var dsn string
 	if mysqlURL != "" {
@@ -34,6 +35,7 @@ func ConnectDatabase() {
 	} else {
 		// fallback ke lokal
 		dsn = "root:root@tcp(localhost:8889)/rest_api_go?charset=utf8mb4&parseTime=True&loc=Local"
+		log.Println("MYSQL_URL not found, using local DB")
 	}
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
