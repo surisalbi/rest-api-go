@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRUD Buku</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col items-center py-10">
+    <div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+      <h1 class="text-2xl font-bold mb-4 text-center">📚 Manajemen Buku</h1>
+
+      <!-- Form Tambah / Update Buku -->
+      <form id="bookForm" class="flex flex-col gap-3 mb-6">
+        <input type="hidden" id="bookId" />
+        <input
+          type="text"
+          id="title"
+          placeholder="Judul Buku"
+          class="p-2 border rounded w-full"
+          required
+        />
+        <input
+          type="text"
+          id="description"
+          placeholder="Deskripsi"
+          class="p-2 border rounded w-full"
+          required
+        />
+        <input
+          type="text"
+          id="author"
+          placeholder="Penulis"
+          class="p-2 border rounded w-full"
+          required
+        />
+        <input
+          type="date"
+          id="publish_date"
+          class="p-2 border rounded w-full"
+          required
+        />
+        <button
+          type="submit"
+          class="bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+        >
+          Simpan Buku
+        </button>
+        <button
+          type="reset"
+          class="bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
+        >
+          Reset
+        </button>
+      </form>
+
+      <!-- Daftar Buku -->
+      <div id="bookList" class="space-y-3"></div>
+    </div>
+
+    <script>
+      const API_URL = "http://localhost:8000/api/books"; // ganti sesuai dengan server Fiber
+
+      const bookForm = document.getElementById("bookForm");
+      const bookList = document.getElementById("bookList");
+      const bookId = document.getElementById("bookId");
+      const title = document.getElementById("title");
+      const description = document.getElementById("description");
+      const author = document.getElementById("author");
+      const publish_date = document.getElementById("publish_date");
+
+      // Load semua buku
+      async function loadBooks() {
+        bookList.innerHTML = "<p class='text-gray-500'>Loading...</p>";
+        try {
+          const res = await fetch(API_URL + "/");
+          if (!res.ok) throw new Error("Gagal fetch API");
+          const books = await res.json();
+
+          if (!books || books.length === 0) {
+            bookList.innerHTML = "<p class='text-gray-500'>Belum ada buku</p>";
+            return;
+          }
+
+          bookList.innerHTML = books
+            .map(
+              (b) => `
+          <div class="flex justify-between items-center border p-3 rounded">
+            <div>
+              <p class="font-semibold">${b.title}</p>
+              <p class="text-sm text-gray-600">Deskripsi: ${b.description}</p>
+              <p class="text-sm text-gray-600">Penulis: ${b.author}</p>
+              <p class="text-sm text-gray-600">Publish: ${b.publish_date}</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="editBook(${b.id}, '${b.title}', '${b.description}', '${b.author}', '${b.publish_date}')"
+                class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</button>
+              <button onclick="deleteBook(${b.id})"
+                class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">Hapus</button>
+            </div>
+          </div>
+        `
+            )
+            .join("");
+        } catch (err) {
+          bookList.innerHTML = `<p class="text-red-500">Error: ${err.message}</p>`;
+        }
+      }
+
+      // Tambah / Update buku
+      bookForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const data = {
+          title: title.value,
+          description: description.value,
+          author: author.value,
+          publish_date: publish_date.value,
+        };
+
+        try {
+          if (bookId.value) {
+            // update
+            await fetch(`${API_URL}/${bookId.value}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+          } else {
+            // tambah
+            await fetch(API_URL + "/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+          }
+          bookForm.reset();
+          bookId.value = "";
+          loadBooks();
+        } catch (err) {
+          alert("Gagal simpan: " + err.message);
+        }
+      });
+
+      // Edit buku
+      function editBook(
+        id,
+        bookTitle,
+        bookDescription,
+        bookAuthor,
+        bookPublishDate
+      ) {
+        bookId.value = id;
+        title.value = bookTitle;
+        description.value = bookDescription;
+        author.value = bookAuthor;
+        publish_date.value = bookPublishDate;
+      }
+
+      // Hapus buku
+      async function deleteBook(id) {
+        if (confirm("Yakin ingin menghapus buku ini?")) {
+          try {
+            await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+            loadBooks();
+          } catch (err) {
+            alert("Gagal hapus: " + err.message);
+          }
+        }
+      }
+
+      // pertama kali load
+      loadBooks();
+    </script>
+  </body>
+</html>
