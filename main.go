@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/surisalbi/rest-api-go/controllers/authorcontroller"
 	"github.com/surisalbi/rest-api-go/controllers/bookcontroller"
 	"github.com/surisalbi/rest-api-go/controllers/membercontroller"
@@ -12,6 +13,11 @@ func main() {
 	models.ConnectDatabase()
 
 	app := fiber.New()
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowMethods: "GET,POST,PUT,DELETE",
+	}))
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
