@@ -10,7 +10,7 @@ var DB *gorm.DB
 
 func ConnectDatabase() {
 	// menghubungkan dengan database mysql
-	db, err := gorm.Open(mysql.Open("root:root@tcp(localhost:8889)/rest_api_go"))
+	db, err := gorm.Open(mysql.Open("root:lHvyuECorZazOiDQxygnblLCcVDLaURc@tcp(mysql.railway.internal:3306)/railway"))
 
 	//cek koneksi ke database
 	if err != nil {
