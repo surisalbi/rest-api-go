@@ -1,6 +1,8 @@
 package models
 
 import (
+	"os"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -10,12 +12,11 @@ var DB *gorm.DB
 
 func ConnectDatabase() {
 	// menghubungkan dengan database mysql
-	db, err := gorm.Open(mysql.Open("root:root@tcp(localhost:8889)/rest_api_go"))
-
-	//cek koneksi ke database
-	if err != nil {
-		panic(err)
-	}
+	dsn := os.Getenv("mysql://root:cfQJevUGGDUfPbvfXhImdnTvCbiwdHTd@mysql.railway.internal:3306/railway") // Railway kasih env ini
+    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    if err != nil {
+        panic("Gagal koneksi database!")
+    }
 
 	// migrasi tabel jika tabel di database kosong
 	db.AutoMigrate(&Book{})

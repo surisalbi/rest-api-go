@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/surisalbi/rest-api-go/controllers/authorcontroller"
@@ -13,6 +15,12 @@ func main() {
 	models.ConnectDatabase()
 
 	app := fiber.New()
+
+	port := os.Getenv("3306")
+    if port == "" {
+        port = "3000" // default local
+    }
+
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: "GET,POST,PUT,DELETE",
